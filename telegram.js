@@ -34,11 +34,11 @@ const bot = new telegraf.Telegraf(BOT_TOKEN);
 bot.start((ctx) => {
     const name = ctx.from?.first_name || ctx.from?.username || 'friend';
     return ctx.replyWithMarkdownV2(
-        `👋 Hi **${escapeMarkdown(name)}**! I'm a Weather bot.\n\n` +
+        `👋 Hi *${escapeMarkdown(name)}*\\! I\\'m a Weather bot\\.\n\n` +
         `Commands:\n` +
-        `/weather <city> - Get current weather by city name\n` +
-        `/weather_coord <lat> <lon> - Get weather by coordinates\n` +
-        `/forecast <city> <hours> - Forecast (hours e.g. 3,6,12) using 3h data\n\n` +
+        `/weather \\<city\\> \\- Get current weather by city name\n` +
+        `/weather\\_coord \\<lat\\> \\<lon\\> \\- Get weather by coordinates\n` +
+        `/forecast \\<city\\> \\<hours\\> \\- Forecast \\(hours e\\.g\\. 3,6,12\\) using 3h data\n\n` +
         `Example: /weather Ho Chi Minh`
     );
 });

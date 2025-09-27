@@ -143,19 +143,55 @@ bot.catch((err, ctx) => {
     console.error('Telegram error', err);
 });
 
-// start polling (simple)
-bot.launch()
-    .then(() => console.log('Telegram bot started (polling)'))
-    .catch(err => console.error('Failed to start bot', err));
+// Clear any existing webhook and start polling with retry logic
+async function startBot() {
+    const maxRetries = 3;
+    const baseDelay = 5000; // 5 seconds
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`🔄 Starting bot (attempt ${attempt}/${maxRetries})...`);
+            
+            // Clear any existing webhook first to avoid conflicts
+            await bot.telegram.deleteWebhook();
+            console.log('✅ Cleared any existing webhook');
+            
+            // Longer delay to ensure webhook is fully cleared
+            const waitTime = baseDelay * attempt; // Increase wait time with each retry
+            console.log(`⏳ Waiting ${waitTime/1000} seconds for Telegram API to release connection...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            
+            // Start polling
+            await bot.launch();
+            console.log('✅ Telegram bot started successfully (polling mode)');
+            return; // Success, exit the function
+            
+        } catch (err) {
+            if (err.response && err.response.error_code === 409) {
+                console.warn(`⚠️  Bot conflict detected (409) on attempt ${attempt}/${maxRetries}`);
+                if (attempt === maxRetries) {
+                    console.error('❌ Failed to start bot after all retries.');
+                    console.error('💡 The bot token may be in use elsewhere. Please:');
+                    console.error('   1. Wait 2-3 minutes and try again');
+                    console.error('   2. Check if the bot is running in another environment');
+                    console.error('   3. Consider using a different bot token for development');
+                    process.exit(1);
+                } else {
+                    console.log(`🔄 Retrying in ${baseDelay * (attempt + 1) / 1000} seconds...`);
+                }
+            } else {
+                console.error('❌ Failed to start bot:', err.message || err);
+                process.exit(1);
+            }
+        }
+    }
+}
+
+// Start the bot
+startBot();
 
 // enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
-module.exports = {
-    bot,
-    BOT_TOKEN,
-    OWM_KEY,
-    TIMEOUT_MS,
-    axios
-}
+// No exports needed - this prevents circular dependency

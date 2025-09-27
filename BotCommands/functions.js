@@ -1,11 +1,8 @@
-const {
-    bot,
-    BOT_TOKEN,
-    OWM_KEY,
-    TIMEOUT_MS,
-} = require('../telegram');
-
 const axios = require('axios');
+
+// Get environment variables directly to avoid circular dependency
+const OWM_KEY = process.env.OWM_API_KEY;
+const TIMEOUT_MS = parseInt(process.env.TIMEOUT_MS || '10000', 10);
 
 async function fetchWeatherByCity(city) {
   const url = `https://api.openweathermap.org/data/2.5/weather`;

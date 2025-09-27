@@ -16,11 +16,15 @@ const OWM_KEY = process.env.OWM_API_KEY;
 const TIMEOUT_MS = parseInt(process.env.TIMEOUT_MS || '10000', 10);
 
 if (!BOT_TOKEN) {
-    console.error('Missing TELEGRAM_TOKEN in .env');
+    console.error('❌ Missing TELEGRAM_API in environment variables');
+    console.error('Please add your Telegram Bot API token from @BotFather');
+    console.error('The bot will not function without this token.');
     process.exit(1);
 }
 if (!OWM_KEY) {
-    console.error('Missing OWM_API_KEY in .env');
+    console.error('❌ Missing OWM_API_KEY in environment variables');
+    console.error('Please add your OpenWeatherMap API key from https://openweathermap.org/api');
+    console.error('The bot will not function without this API key.');
     process.exit(1);
 }
 
